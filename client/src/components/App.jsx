@@ -25,6 +25,7 @@ class App extends React.Component{
 
   handleAddMovie(){
     event.preventDefault();
+    this.setState({searchResults: undefined});
     var newAddedMovie = {
       title: this.state.newMovie
     }
@@ -36,26 +37,23 @@ class App extends React.Component{
 
   handleSearchMovie(){
     event.preventDefault()
-    var newSearchMovie = this.state.searchMovie;
-
-    // result array
-    var result = [];
-    // iterate through the movieData
-    for (var i = 0; i < this.state.movieData.length; i++) {
-      // if current movie title matches target search
-      if(this.state.movieData[i].title.toLowerCase().indexOf(this.state.searchMovie.toLowerCase()) !== -1) {
-        // push movie to a new array
-        result.push(this.state.movieData[i]);
-      }
-    }
-    if(result.length === 0) {
-      result.push({title: 'No Movie Found'})
+    this.setState({searchResults: undefined});
+    var filtered = this.state.movieData.filter(movie => {
+      return movie.title.toLowerCase().includes(this.state.searchMovie)
+    })
+    if(filtered.length === 0) {
+      filtered.push({title: 'No Movie Found'})
     }
     // set state to be the new array
-    this.setState({movieData: result})
+    this.setState({searchResults: filtered})
   }
 
   render(){
+    // data to map variable
+    var listToRender = (this.state.searchResults === undefined ) ? this.state.movieData : this.state.searchResults;
+    // if this.state.searchResults are undefined
+      // listToRender is this.state.movieData
+    // otherwise: render this.state.searchresults
     return(
       <div>
         <h1>MovieList</h1>
@@ -66,7 +64,7 @@ class App extends React.Component{
             <button onClick={this.handleSearchMovie}>Search Movies</button>
         </form>
           <ul>
-            {this.state.movieData.map((movie, index) => (<MovieList key={index} movie={movie}/>))}
+            {listToRender.map((movie, index) => (<MovieList key={index} movie={movie}/>))}
           </ul>
           <form>
             <label>
